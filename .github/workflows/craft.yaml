@@ -9,6 +9,7 @@ jobs:
         New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -PropertyType DWord -Value 1 -Force
         Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
         Remove-Item -Path "C:\mingw64" -Recurse -Force -ErrorAction Ignore
+        Remove-Item -Path "C:\Strawberry" -Recurse -Force -ErrorAction Ignore
         Remove-Item -Path "C:\Program Files\Git\bin\sh.exe" -Force
         git config --global core.autocrlf false
       shell: pwsh
@@ -26,6 +27,7 @@ jobs:
         $env:ANDROID_SDK_ROOT = $null
         & $env:VSDEVSH_PATH -SkipAutomaticLocation -Arch amd64 -HostArch amd64
         Unblock-File -Path C:\CraftRoot\craft\craftenv.ps1
+        (Get-Content C:\CraftRoot\craft\craftenv.ps1) -replace '^cls$', '' | Set-Content C:\CraftRoot\craft\craftenv.ps1
         . C:\CraftRoot\craft\craftenv.ps1
         craft hunspell -v --ci-mode
         craft sonnet -v --ci-mode --options kde/frameworks/tier1/sonnet.useHunspell=True

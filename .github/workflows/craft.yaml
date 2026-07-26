@@ -4,13 +4,19 @@ jobs:
       VSDEVSH_PATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\Launch-VsDevShell.ps1
     runs-on: windows-2022
     steps:
-    - name: Install Craft
+    - name: Setup Env
       run: |
         New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -PropertyType DWord -Value 1 -Force
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+        Remove-Item -Path "C:\mingw64" -Recurse -Force -ErrorAction Ignore
+        Remove-Item -Path "C:\Program Files\Git\bin\sh.exe" -Force
+        git config --global core.autocrlf false
+      shell: pwsh
+    - name: Install Craft
+      run: |
         python -m pip install --upgrade certifi
         & $env:VSDEVSH_PATH -SkipAutomaticLocation -Arch amd64 -HostArch amd64
         Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/KDE/craft/master/setup/install_craft.ps1' -OutFile install_craft.ps1
-        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
         Unblock-File -Path .\install_craft.ps1
         & .\install_craft.ps1 -root C:\CraftRoot\ -use-defaults
       shell: pwsh

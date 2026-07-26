@@ -15,6 +15,7 @@ jobs:
     - name: Install Craft
       run: |
         python -m pip install --upgrade certifi
+        $env:ANDROID_SDK_ROOT = $null
         & $env:VSDEVSH_PATH -SkipAutomaticLocation -Arch amd64 -HostArch amd64
         Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/KDE/craft/master/setup/install_craft.ps1' -OutFile install_craft.ps1
         Unblock-File -Path .\install_craft.ps1
@@ -22,6 +23,7 @@ jobs:
       shell: pwsh
     - name: Craft 'em
       run: |
+        $env:ANDROID_SDK_ROOT = $null
         & $env:VSDEVSH_PATH -SkipAutomaticLocation -Arch amd64 -HostArch amd64
         Unblock-File -Path C:\CraftRoot\craft\craftenv.ps1
         . C:\CraftRoot\craft\craftenv.ps1

@@ -32,12 +32,13 @@ jobs:
         craft -v --ci-mode hunspell
         craft -v --ci-mode --options kde/frameworks/tier1/sonnet.useHunspell=True sonnet
         Get-ChildItem -Path C:\CraftRoot\bin -Recurse -Filter *.dll | Select-Object -ExpandProperty FullName
+        Get-ChildItem -Path C:\CraftRoot\plugins -Recurse -Filter *.dll | Select-Object -ExpandProperty FullName
       shell: pwsh
     - name: Pick DLL
       run: |
         New-Item -Path .\artifact -ItemType Directory
         Copy-Item -Path C:\CraftRoot\bin\libhunspell*.dll -Destination .\artifact
-        Copy-Item -Path C:\CraftRoot\bin\plugins\kf6\sonnet\sonnet_*.dll -Destination .\artifact
+        Copy-Item -Path C:\CraftRoot\plugins\kf6\sonnet\sonnet_hunspell.dll -Destination .\artifact
         Get-ChildItem -Path .\artifact
       shell: pwsh
     - name: Upload Artifact

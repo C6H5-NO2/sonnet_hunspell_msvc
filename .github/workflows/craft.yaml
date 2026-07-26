@@ -6,6 +6,7 @@ jobs:
     steps:
     - name: Install Craft
       run: |
+        New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -PropertyType DWord -Value 1 -Force
         python -m pip install --upgrade certifi
         & $env:VSDEVSH_PATH -SkipAutomaticLocation -Arch amd64 -HostArch amd64
         Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/KDE/craft/master/setup/install_craft.ps1' -OutFile install_craft.ps1

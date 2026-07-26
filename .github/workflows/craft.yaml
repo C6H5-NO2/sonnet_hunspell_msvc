@@ -1,0 +1,39 @@
+jobs:
+  build_dll:
+    runs-on: windows-latest
+    steps:
+    - name: Install Craft
+      run: |
+        python -m pip install --upgrade certifi
+        Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/KDE/craft/master/setup/install_craft.ps1' -OutFile install_craft.ps1
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force
+        Unblock-File -Path .\install_craft.ps1
+        .\install_craft.ps1 -root C:\CraftRoot\ -use-defaults
+      shell: pwsh
+    - name: Craft 'em
+      run: |
+        Unblock-File -Path C:\CraftRoot\craft\craftenv.ps1
+        . C:\CraftRoot\craft\craftenv.ps1
+        craft hunspell -v --ci-mode
+        craft sonnet -v --ci-mode --options kde/frameworks/tier1/sonnet.useHunspell=True
+        Get-ChildItem -Path C:\CraftRoot\bin -Recurse -Filter *.dll | Select-Object -ExpandProperty FullName
+      shell: pwsh
+    - name: Pick DLL
+      run: |
+        New-Item -Path .\artifact -ItemType Directory
+        Copy-Item -Path C:\CraftRoot\bin\libhunspell*.dll -Destination .\artifact
+        Copy-Item -Path C:\CraftRoot\bin\plugins\kf6\sonnet\sonnet_*.dll -Destination .\artifact
+        Get-ChildItem -Path .\artifact
+      shell: pwsh
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: sonnet_hunspell_msvc
+        path: .\artifact\*.dll
+        retention-days: 1
+    timeout-minutes: 90
+name: Build sonnet_hunspell.dll
+'on':
+  workflow_dispatch:
+permissions:
+  contents: read

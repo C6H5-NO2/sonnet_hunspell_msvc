@@ -29,8 +29,8 @@ jobs:
         Unblock-File -Path C:\CraftRoot\craft\craftenv.ps1
         (Get-Content C:\CraftRoot\craft\craftenv.ps1) -replace '^cls$', '' | Set-Content C:\CraftRoot\craft\craftenv.ps1
         . C:\CraftRoot\craft\craftenv.ps1
-        craft hunspell -v --ci-mode
-        craft sonnet -v --ci-mode --options kde/frameworks/tier1/sonnet.useHunspell=True
+        craft -v --ci-mode hunspell
+        craft -v --ci-mode --options kde/frameworks/tier1/sonnet.useHunspell=True sonnet
         Get-ChildItem -Path C:\CraftRoot\bin -Recurse -Filter *.dll | Select-Object -ExpandProperty FullName
       shell: pwsh
     - name: Pick DLL

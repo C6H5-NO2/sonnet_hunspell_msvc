@@ -5,17 +5,22 @@ jobs:
     runs-on: windows-2022
     steps:
     - name: Setup Env
+      # Enable dev mode to allow symbolic links
+      # Allow script execution
+      # Remove conflicting names from PATH
+      # Remove Android SDK from env to avoid Craft targeting Android
       run: |
         New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -PropertyType DWord -Value 1 -Force
         Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
         Remove-Item -Path "C:\mingw64" -Recurse -Force -ErrorAction Ignore
         Remove-Item -Path "C:\Strawberry" -Recurse -Force -ErrorAction Ignore
         Remove-Item -Path "C:\Program Files\Git\bin\sh.exe" -Force
+        [Environment]::SetEnvironmentVariable("ANDROID_SDK_ROOT", $null, "Machine")
         git config --global core.autocrlf false
+        python -m pip install --upgrade certifi
       shell: pwsh
     - name: Install Craft
       run: |
-        python -m pip install --upgrade certifi
         $env:ANDROID_SDK_ROOT = $null
         & $env:VSDEVSH_PATH -SkipAutomaticLocation -Arch amd64 -HostArch amd64
         Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/KDE/craft/master/setup/install_craft.ps1' -OutFile install_craft.ps1
@@ -23,6 +28,7 @@ jobs:
         & .\install_craft.ps1 -root C:\CraftRoot\ -use-defaults
       shell: pwsh
     - name: Craft 'em
+      # Delete `cls` from script to prevent it crashing the terminal
       run: |
         $env:ANDROID_SDK_ROOT = $null
         & $env:VSDEVSH_PATH -SkipAutomaticLocation -Arch amd64 -HostArch amd64
@@ -47,7 +53,7 @@ jobs:
         name: sonnet_hunspell_msvc
         path: .\artifact\*.dll
         retention-days: 1
-    timeout-minutes: 90
+    timeout-minutes: 15
 name: Build sonnet_hunspell.dll
 'on':
   workflow_dispatch:
